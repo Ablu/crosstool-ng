@@ -1269,8 +1269,10 @@ do_gcc_backend() {
 
     CT_DoLog DEBUG "Extra config passed: '${extra_config[*]}'"
 
-    # We may need to modify host/build/target CFLAGS separately below
-    cflags_for_build="${cflags}"
+    # We may need to modify host/build/target CFLAGS separately below. Note
+    # that ${cflags} may refer either to build or host CFLAGS; they are provided
+    # by the caller.
+    cflags_for_build="${CT_CFLAGS_FOR_BUILD}"
     cxxflags_for_build="${CT_CXXFLAGS_FOR_BUILD}"
     cflags_for_target="${CT_TARGET_CFLAGS}"
 
