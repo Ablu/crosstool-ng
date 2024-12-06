@@ -1338,6 +1338,16 @@ do_gcc_backend() {
     if [ "${CT_CANADIAN}" = "y" ]; then
         CT_DoLog EXTRA "Building libiberty"
         CT_DoExecLog ALL make ${CT_JOBSFLAGS} all-build-libiberty
+
+	# HACK: Workaround a canadian-cross problem in gcc-14.2 (at the very
+	#       least). If we allow the top-level Makefile to dive into
+	#       libcpp then it will be built with the host cxxflags which
+	#       will break the build if those flags are not supported by
+	#       the build compiler (e.g. -march=). This hack forces libcpp to
+	#       be built using cxxflags_for_build instead.
+	# TODO: This should probably have been a patch for gcc...
+        CT_DoLog EXTRA "Building libcpp"
+        CT_DoExecLog ALL make ${CT_JOBSFLAGS} CXXFLAGS="${cxxflags_for_build}" all-build-libcpp
     fi
 
     CT_DoLog EXTRA "Building final gcc compiler"
