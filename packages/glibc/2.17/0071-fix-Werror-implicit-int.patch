@@ -1,0 +1,50 @@
+Currently glibc-2.17 fails to build with recent versions of gcc that
+have -Werror=implicit-int by default. There's nothing wrong with the glibc
+code but the configiure script gets a couple of the decisions wrong since
+the compiler probes spuriously fail.
+
+Whilst we could probably fix this by re-running autoconf, glibc-2.17 is
+pretty old so let's fix this by directly hacking at the configure script.
+
+Index: glibc-2.17/configure
+===================================================================
+--- glibc-2.17.orig/configure
++++ glibc-2.17/configure
+@@ -6748,7 +6748,7 @@ else
+   cat > conftest.c <<EOF
+ int foo;
+ #ifdef __GNUC_GNU_INLINE__
+-main () { return 0;}
++int main () { return 0;}
+ #else
+ #error
+ #endif
+@@ -6914,9 +6914,9 @@ if ${libc_cv_ld_no_whole_archive+:} fals
+   $as_echo_n "(cached) " >&6
+ else
+   cat > conftest.c <<\EOF
+-_start () {}
++void _start () {}
+ int __eh_pc;
+-__throw () {}
++void __throw () {}
+ EOF
+ if { ac_try='${CC-cc} $CFLAGS $CPPFLAGS $LDFLAGS
+ 			    -nostdlib -nostartfiles -Wl,--no-whole-archive
+@@ -6944,9 +6944,9 @@ if ${libc_cv_gcc_exceptions+:} false; th
+   $as_echo_n "(cached) " >&6
+ else
+   cat > conftest.c <<\EOF
+-_start () {}
++void _start () {}
+ int __eh_pc;
+-__throw () {}
++void __throw () {}
+ EOF
+ if { ac_try='${CC-cc} $CFLAGS $CPPFLAGS $LDFLAGS
+ 			    -nostdlib -nostartfiles -fexceptions
+@@ -9104,4 +9104,3 @@ if test -n "$ac_unrecognized_opts" && te
+   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unrecognized options: $ac_unrecognized_opts" >&5
+ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
+ fi
+-
