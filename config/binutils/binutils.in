@@ -179,6 +179,17 @@ config BINUTILS_EXTRA_CONFIG_ARRAY
       if they are properly quoted (or escaped, but prefer quotes). Eg.:
           --with-foo="1st arg with 4 spaces" --with-bar=2nd-arg-without-space
 
+config BINUTILS_STATIC_LIBSTDCXX
+    bool "Link libstdc++ statically into the binutils binaries"
+    default y
+    depends on CONFIGURE_has_static_link || CANADIAN || CROSS_NATIVE
+    help
+      Newer binutils versions require some c++ libraries. So statically
+      linking libstdc++ increases the likeliness that the binutils binaries will
+      run on machines other than the one which it was built on, without
+      having to worry about distributing the matching version of libstdc++
+      along with it.
+
 config BINUTILS_FOR_TARGET
     bool
     prompt "binutils libraries for the target"

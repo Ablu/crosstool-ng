@@ -26,6 +26,14 @@ config GDB_CROSS_STATIC
       That way, you can share the cross-gdb without installing a toolchain
       on every machine that will be used to debug target programs.
 
+config GDB_CROSS_STATIC_LIBSTDCXX
+    bool
+    prompt "Link against static libstdc+++"
+    depends on (!GDB_CROSS_STATIC) && (CONFIGURE_has_static_link || CANADIAN || CROSS_NATIVE)
+    default n
+    help
+      Say 'y' if you do not want gdb to require libstdc++.so.
+
 config GDB_CROSS_SIM
     bool
     prompt "Enable 'sim'"

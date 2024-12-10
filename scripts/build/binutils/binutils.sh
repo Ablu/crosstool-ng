@@ -187,6 +187,11 @@ do_binutils_backend() {
         extra_config+=("--without-zstd")
     fi
 
+    if [ "${CT_BINUTILS_STATIC_LIBSTDCXX}" = "y" ]; then
+        ldflags+=" -static-libgcc"
+        ldflags+=" -static-libstdc++"
+    fi
+
     # gold links with CXXLINK/g++, not libtool, and does not understand
     # -all-static
     if [ "${static_build}" = "y" ]; then
