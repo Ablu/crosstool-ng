@@ -1,0 +1,66 @@
+From 2a0f5825f152176ff419e7b4e92f7921aef0e9bc Mon Sep 17 00:00:00 2001
+From: Erik Wierich <erik@riscstar.com>
+Date: Fri, 19 Jun 2026 06:42:40 +0200
+Subject: [PATCH] libstdc++: Add -nostdinc++ for c++23 sources
+
+This seems to be another variant of [PR100017], which was fixed in
+01a70ccd723eb9a479186fe37c972b0d0f8676cf for c++17 sources.
+
+The compilation will get contaminated with headers from the cross
+compiler, where the shared include guards on the wrappers lead to
+skipping the actual include of the fenv.h.
+
+This disables the automatic host compiler include paths to fix that. It
+might make sense to issue the -nostdinc++ at a higher level to ensure
+that this problem does not keep popping up on future, but this only
+copies the fix from 01a70ccd723eb9a479186fe37c972b0d0f8676cf for now.
+---
+ libstdc++-v3/src/c++23/Makefile.am | 2 +-
+ libstdc++-v3/src/c++23/Makefile.in | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libstdc++-v3/src/c++23/Makefile.am b/libstdc++-v3/src/c++23/Makefile.am
+index 5b2812abd22..7fb7f52c0c4 100644
+--- a/libstdc++-v3/src/c++23/Makefile.am
++++ b/libstdc++-v3/src/c++23/Makefile.am
+@@ -129,15 +129,15 @@ std.compat.o: std.compat.cc std.o
+ 
+ # AM_CXXFLAGS needs to be in each subdirectory so that it can be
+ # modified in a per-library or per-sub-library way.  Need to manually
+ # set this option because CONFIG_CXXFLAGS has to be after
+ # OPTIMIZE_CXXFLAGS on the compile line so that -O2 can be overridden
+ # as the occasion calls for it.
+ AM_CXXFLAGS = \
+-	-std=gnu++23 \
++	-std=gnu++23 -nostdinc++ \
+ 	$(glibcxx_lt_pic_flag) $(glibcxx_compiler_shared_flag) \
+ 	$(XTEMPLATE_FLAGS) $(VTV_CXXFLAGS) \
+ 	$(WARN_CXXFLAGS) $(OPTIMIZE_CXXFLAGS) $(CONFIG_CXXFLAGS) \
+ 	-fimplicit-templates
+ 
+ AM_MAKEFLAGS = \
+ 	"gxx_include_dir=$(gxx_include_dir)"
+diff --git a/libstdc++-v3/src/c++23/Makefile.in b/libstdc++-v3/src/c++23/Makefile.in
+index 75da9c008ab..cb59d5a6dbc 100644
+--- a/libstdc++-v3/src/c++23/Makefile.in
++++ b/libstdc++-v3/src/c++23/Makefile.in
+@@ -488,15 +488,15 @@ MODULES_FLAGS = -isystem ${glibcxx_srcdir}/include/backward -fmodules \
+ 
+ # AM_CXXFLAGS needs to be in each subdirectory so that it can be
+ # modified in a per-library or per-sub-library way.  Need to manually
+ # set this option because CONFIG_CXXFLAGS has to be after
+ # OPTIMIZE_CXXFLAGS on the compile line so that -O2 can be overridden
+ # as the occasion calls for it.
+ AM_CXXFLAGS = \
+-	-std=gnu++23 \
++	-std=gnu++23 -nostdinc++ \
+ 	$(glibcxx_lt_pic_flag) $(glibcxx_compiler_shared_flag) \
+ 	$(XTEMPLATE_FLAGS) $(VTV_CXXFLAGS) \
+ 	$(WARN_CXXFLAGS) $(OPTIMIZE_CXXFLAGS) $(CONFIG_CXXFLAGS) \
+ 	-fimplicit-templates
+ 
+ AM_MAKEFLAGS = \
+ 	"gxx_include_dir=$(gxx_include_dir)"
+-- 
+2.54.0
+
